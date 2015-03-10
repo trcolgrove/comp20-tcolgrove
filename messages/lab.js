@@ -15,7 +15,7 @@ function parse(){
     for(var i = 0; i < arr.length; i++){
         username = arr[i].username;
         content = arr[i].content;
-        toUpdate.innerHTML += '<p class="messages"> <span class="content">' + content + '</span> <span class="username">' + username+
+        toUpdate.innerHTML += '<p class="message"> <span class="content">' + content + '</span> <span class="username">' + username+
         '</span> </p>'
     }
   }

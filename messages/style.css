@@ -16,3 +16,11 @@ body {
 	margin-top: 5px;
 	text-indent: 10px;
 }
+
+.content{
+	font-size: 14px;
+}
+
+.username{
+	font-size: 12px;
+}
