@@ -9,5 +9,5 @@ function parse(){
   req.onload = reqListener;
   req.open("get", url, true);
   req.send();
-  document.getElementByID("messages").innerHTML;
+  document.getElementById("messages").innerHTML;
 }
