@@ -9,5 +9,6 @@ function parse(){
   req.onload = reqListener;
   req.open("get", url, true);
   req.send();
+  console.log("my dick is on fire")
   document.getElementById("messages").innerHTML;
 }
