@@ -3,12 +3,22 @@ function reqListener () {
   console.log(this.responseText);
 }
 
+var xmlhttp = new XMLHttpRequest();
+var url = "data.json";
+
+xmlhttp.onreadystatechange = function(){
+  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        var myArr = JSON.parse(xmlhttp.responseText);
+        parse(myArr);
+  }
+}
+
 function parse(){
-  var req = new XMLHttpRequest();
-  var url = "data.json";
+  var out = ""
+  for(var i = 0; i < arr.length; i++){
+        out += arr[i].content;
+        myFunction(myArr);
+  }
   req.onload = reqListener;
-  req.open("get", url, true);
-  req.send();
-  console.log("my dick is on fire")
-  document.getElementById("messages").innerHTML;
+  document.getElementById("messages").innerHTML = out;
 }
