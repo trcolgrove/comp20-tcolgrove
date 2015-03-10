@@ -13,9 +13,8 @@ function parse(){
   for(var i = 0; i < arr.length; i++){
         out += arr[i].content;
         myFunction(myArr);
-        req.onload = reqListener;
+        console.log("doooooodoodoo")
         document.getElementById("messages").innerHTML = out;
-  
-  }
+      }
   }
 }
