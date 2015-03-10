@@ -13,7 +13,7 @@ xmlhttp.onreadystatechange = function(){
   }
 }
 
-function parse(){
+function parse(arr){
   var out = ""
   for(var i = 0; i < arr.length; i++){
         out += arr[i].content;
