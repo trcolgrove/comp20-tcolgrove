@@ -10,11 +10,13 @@ function parse(){
   xmlhttp.send();
 
   xmlhttp.onreadystatechange = function(){
-  var arr = JSON.parse(xmlhttp.responseText);
-  for(var i = 0; i < arr.length; i++){
-        out += arr[i].content;
-        console.log("doooooodoodoo")
-        document.getElementById("messages").innerHTML = out;
-      }
+    toUpdate = document.getElementById("messages");
+    var arr = JSON.parse(xmlhttp.responseText);
+    for(var i = 0; i < arr.length; i++){
+        username = arr[i].username;
+        content = arr[i].content;
+        toUpdate.innerHTML += '<p class="message">' + content + '</p> <p class="username">' + username+
+        '</p>'
+    }
   }
 }
