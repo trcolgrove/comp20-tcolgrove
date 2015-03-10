@@ -5,10 +5,9 @@ function reqListener () {
 
 function parse(){
   var req = new XMLHttpRequest();
-  var url = "data.json"
+  var url = "data.json";
   req.onload = reqListener;
   req.open("get", url, true);
   req.send();
-  document.getElementByID("messages").innerHTML
-
+  document.getElementByID("messages").innerHTML;
 }
