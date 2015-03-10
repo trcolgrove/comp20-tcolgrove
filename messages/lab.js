@@ -9,7 +9,7 @@ function parse(){
   xmlhttp.open("GET", url, true);
   xmlhttp.send();
 
-  //xmlhttp.onreadystatechange = function(){
+    xmlhttp.onreadystatechange = function(){
     toUpdate = document.getElementById("messages");
     var arr = JSON.parse(xmlhttp.responseText);
     for(var i = 0; i < arr.length; i++){
@@ -17,6 +17,6 @@ function parse(){
         content = arr[i].content;
         toUpdate.innerHTML += '<p class="messages"> <span class="content">' + content + '</span> <span class="username">' + username+
         '</span> </p>'
-  //  }
+    }
   }
 }
