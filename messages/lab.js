@@ -2,7 +2,7 @@
 
 function parse(){
   var xmlhttp = new XMLHttpRequest();
-  var url = "data.json";
+  var url = "http://messagehub.herokuapp.com/messages.json";
   xmlhttp.open("GET", url, true);
   xmlhttp.send();
 
@@ -16,6 +16,6 @@ function parse(){
         toUpdate.innerHTML += '<p class="message"> <span class="content">' + content + '</span> <span class="username">' + username+
         '</span> </p>'
       }
-    }  
+    }
   }
 }
