@@ -1,8 +1,9 @@
-var usrLat = 0
-var usrLng = 0
+var myLat = 0;
+var myLng = 0;
 var map;
+var url = "https://secret-about-box.herokuapp.com/sendLocation"
 var xmlhttp = new XMLHttpRequest();
-var me = new google.maps.LatLng(usrLat, usrLng);
+var me = new google.maps.LatLng(myLat, myLng);
 var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
@@ -17,13 +18,22 @@ function init() {
     mapOptions);
 }
 
-function getUserLocation(){
+function getMyLocation(){
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(function(position){
-        usrLat = position.coords.latitude;
-        usrLng = position.coords.longitude;
+        myLat = position.coords.latitude;
+        myLng = position.coords.longitude;
     });
   }
+}
+
+function getUserLocations(){
+  xmlhttp.open("POST", url, true);
+  var data = xmlhttp.send()
+}
+
+function createMarker(){
+
 }
 /*
 function parseData(){
