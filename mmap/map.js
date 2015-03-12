@@ -11,11 +11,11 @@ var infowindow = new google.maps.InfoWindow();
 
 function init() {
   var mapOptions = {
-    center: { lat: -34.397, lng: 150.644},
+    center: me,
     zoom: 13, // The larger the zoom number, the bigger the zoom
 		mapTypeId: google.maps.MapTypeId.ROADMAP
   };
-  var map = new google.maps.Map(document.getElementById('map-canvas'),
+    map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
   getMyLocation();
 }
@@ -25,7 +25,8 @@ function getMyLocation(){
     navigator.geolocation.getCurrentPosition(function(position){
         myLat = position.coords.latitude;
         myLng = position.coords.longitude;
-        console.log(myLat);
+        me = new google.maps.LatLng(myLat, myLng);
+        map.panTo(me);
         renderMap();
     });
   }
@@ -45,16 +46,30 @@ function getUserLocations(){
 
   xmlhttp.onreadystatechange = function(){
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-      console.log(xmlhttp.responseText);
+      var userlist = JSON.parse(xmlhttp.responseText);
+      parseUserJSON(userlist);
     }
   }
-  /*var arr = JSON.parse(xmlhttp.responseText);
-  for(var i = 0; i < arr.length; i++){
-    console.log(arr[i].login);
-  }*/
+
 }
 
-function createMarker(){
+function parseUserJSON(userlist){
+  for(var i = 0; i < userlist.length; i++){
+    login = userlist[i].login;
+    lat = userlist[i].lat;
+    lng = userlist[i].lng;
+    createMarker(login, lat, lng)
+    console.log(login)
+  }
+}
+
+function createMarker(login, lat, lng){
+        var marker = new google.maps.Marker({
+					map: map,
+					position: new google.maps.LatLng(lat, lng)
+				});
+        marker.setMap(map);
+
 }
 /*
 function parseData(){
