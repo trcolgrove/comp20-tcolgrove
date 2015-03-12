@@ -8,6 +8,8 @@ var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
 var myLogin = "FrancieCarmody"
+var audio = new Audio('yoshi.wav');
+
 Number.prototype.toRad = function() {
   return this * Math.PI / 180;
 }
@@ -81,13 +83,14 @@ function createMarker(login, lat, lng){
         distance.kmToMi();
 
         if(login == myLogin){
-            var marker = new google.maps.Marker({
+          var marker = new google.maps.Marker({
   					map: map,
   					position: new google.maps.LatLng(lat, lng),
             icon: image
   				});
           marker.setMap(map);
             google.maps.event.addListener(marker, 'click', function() {
+            audio.play();
             infowindow.setContent("WOAH NICE GRAPHICS, I'D LIKE TO GET MY HANDS ON THAT GAME");
             infowindow.open(map,marker);
           });
