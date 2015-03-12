@@ -50,7 +50,6 @@ function renderMap(){
 
 function getUserLocations(){
   params = "login=FrancieCarmody&lat=" + myLat + "&lng=" + myLng;
-  console.log(params);
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xmlhttp.send(params);
@@ -73,7 +72,6 @@ function parseUserJSON(userlist){
     lat = userlist[i].lat;
     lng = userlist[i].lng;
     createMarker(login, lat, lng)
-    console.log(login)
   }
 }
 
