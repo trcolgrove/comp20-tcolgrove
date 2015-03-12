@@ -8,6 +8,13 @@ var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
 
+Number.prototype.toRad = function() {
+  return this * Math.PI / 180;
+}
+
+Number.prototype.kmToMi = function() {
+  return this * .621371;
+}
 
 function init() {
   var mapOptions = {
@@ -70,7 +77,33 @@ function createMarker(login, lat, lng){
 				});
         marker.setMap(map);
 
+        var distance = haversineConvert(myLat, myLng, lat, lng)
+        distance = (distance/1000);
+        distance.kmToMi();
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(login + distance);
+          infowindow.open(map,marker);
+        });
 }
+
+function haversineConvert(lat1, lng1, lat2, lng2){
+
+  var R = 6371000; // metres
+  var phi1 = lat1.toRad();
+  var phi2 = lat2.toRad();
+  var delta_phi = (lat2-lat1).toRad();
+  var delta_lambda = (lng2-lng1).toRad();
+
+  var a = Math.sin(delta_phi/2) * Math.sin(delta_phi/2) +
+        Math.cos(phi1) * Math.cos(phi2) *
+        Math.sin(delta_lambda/2) * Math.sin(delta_lambda/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  var d = R * c;
+
+  return d;
+}
+
 /*
 function parseData(){
 }
