@@ -7,7 +7,7 @@ var me = new google.maps.LatLng(myLat, myLng);
 var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
-
+var myLogin = "FrancieCarmody"
 Number.prototype.toRad = function() {
   return this * Math.PI / 180;
 }
@@ -32,14 +32,16 @@ function getMyLocation(){
     navigator.geolocation.getCurrentPosition(function(position){
         myLat = position.coords.latitude;
         myLng = position.coords.longitude;
-        me = new google.maps.LatLng(myLat, myLng);
-        map.panTo(me);
         renderMap();
     });
   }
 }
 
 function renderMap(){
+
+  me = new google.maps.LatLng(myLat, myLng);
+  map.panTo(me);
+
   getUserLocations();
 }
 
@@ -71,19 +73,37 @@ function parseUserJSON(userlist){
 }
 
 function createMarker(login, lat, lng){
-        var marker = new google.maps.Marker({
-					map: map,
-					position: new google.maps.LatLng(lat, lng)
-				});
-        marker.setMap(map);
+
+        var image = "yoshi.png";
 
         var distance = haversineConvert(myLat, myLng, lat, lng)
         distance = (distance/1000);
         distance.kmToMi();
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.setContent(login + distance);
-          infowindow.open(map,marker);
-        });
+
+        if(login == myLogin){
+            var marker = new google.maps.Marker({
+  					map: map,
+  					position: new google.maps.LatLng(lat, lng),
+            icon: image
+  				});
+          marker.setMap(map);
+            google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent("WOAH NICE GRAPHICS, I'D LIKE TO GET MY HANDS ON THAT GAME");
+            infowindow.open(map,marker);
+          });
+
+        }
+        else{
+          var marker = new google.maps.Marker({
+            map: map,
+            position: new google.maps.LatLng(lat, lng),
+          });
+          marker.setMap(map);
+            google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent(login + distance);
+            infowindow.open(map,marker);
+          });
+        }
 }
 
 function haversineConvert(lat1, lng1, lat2, lng2){
