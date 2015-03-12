@@ -94,7 +94,7 @@ function createMarker(login, lat, lng){
           marker.setMap(map);
             google.maps.event.addListener(marker, 'click', function() {
             audio.play();
-            infowindow.setContent("WOAH NICE GRAPHICS, I'D LIKE TO GET MY HANDS ON THAT GAME");
+            infowindow.setContent( "<div id='login'>" + login + "</div> </br> <div class='textit'> >My location is </div> lat: " + lat + "</br>lng: " + lng + "</br></br> WOAH! NICE GRAPHICS!");
             infowindow.open(map,marker);
           });
 
@@ -106,7 +106,7 @@ function createMarker(login, lat, lng){
           });
           marker.setMap(map);
             google.maps.event.addListener(marker, 'click', function() {
-            infowindow.setContent(login + distance);
+            infowindow.setContent("<div id=login>" + login + "</div> </br> distance: " + distance + "mi");
             infowindow.open(map,marker);
           });
         }

@@ -35,3 +35,12 @@ body {
 	text-align: center;
 
 }
+
+#login{
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.textit{
+	font-style: italic;
+}
