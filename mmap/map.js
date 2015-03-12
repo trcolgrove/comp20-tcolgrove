@@ -10,6 +10,7 @@ var infowindow = new google.maps.InfoWindow();
 var myLogin = "FrancieCarmody"
 var audio = new Audio('yoshi.wav');
 
+
 Number.prototype.toRad = function() {
   return this * Math.PI / 180;
 }
@@ -59,6 +60,8 @@ function getUserLocations(){
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
       var userlist = JSON.parse(xmlhttp.responseText);
       parseUserJSON(userlist);
+      var load_screen = document.getElementById("load_screen");
+      document.body.removeChild(load_screen);
     }
   }
 

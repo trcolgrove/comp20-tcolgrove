@@ -1,9 +1,17 @@
 /*CSS goes here gangster*/
+
+
 html {
 	height: 100%;
-	font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+	font-family: Georgia, serif;
+	background: #66CCFF;
 }
 
+h1{
+	color: white;
+	background: black;
+	padding-left: 3vw;
+}
 body {
 	height: 100%;
 	margin: 0px;
@@ -13,4 +21,17 @@ body {
 #map-canvas {
 	width: 100%;
 	height: 100%;
+}
+
+#load_screen{
+	background: black;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+}
+#load_text{
+	color: white;
+	padding-top: 200px;
+	text-align: center;
+
 }
