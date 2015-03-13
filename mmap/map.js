@@ -1,13 +1,13 @@
 var myLat = 0;
 var myLng = 0;
 var map;
-var url = "https://secret-about-box.herokuapp.com/sendLocation"
+var url = "https://secret-about-box.herokuapp.com/sendLocation";
 var xmlhttp = new XMLHttpRequest();
 var me = new google.maps.LatLng(myLat, myLng);
 var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
-var myLogin = "FrancieCarmody"
+var myLogin = "FrancieCarmody";
 var audio = new Audio('yoshi.wav');
 
 
@@ -81,7 +81,7 @@ function createMarker(login, lat, lng){
 
         var distance = haversineConvert(myLat, myLng, lat, lng)
         distance = (distance/1000);
-        distance.kmToMi();
+        distance = distance.kmToMi();
 
         if(login == myLogin){
           var marker = new google.maps.Marker({
