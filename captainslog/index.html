@@ -7,18 +7,35 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>
 	    $(document).ready(function(){
+			var keys = [];
+			var i = 0;
+			for (key in localStorage) {
+				keys.push(key);
+				console.log(keys[i]);
+				i++
+			}
+			keys.sort();
+			for(k in keys){
+				var key = keys[k];
+				$('#log').prepend(localStorage[key]);
+			}
 
+			$('#log').prepend(localStorage.getItem('reloadtxt'));
 			$('#msg').bind('keyup', function(e) {
 				var code = e.keyCode || e.which;
 				if(code == 13) { //Enter keycode
 					var date = new Date();
 					var dateString = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
 					var timeString =  date.getHours()%12 + ":" + date.getMinutes();
-					$('#log').prepend('<p>' + dateString + " " + timeString + ' - ' + $('#msg').val() + '</p>');
+					var logmsg = ('<p>' + dateString + " " + timeString + ' - ' + $('#msg').val() + '</p>');
+					$('#log').prepend(logmsg);
 					$('#msg').val("");
-				}
+					localStorage[new Date().getTime()] = logmsg;
+					}
 			});
     })
+
+
 	</script>
 </head>
 
