@@ -7,7 +7,6 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>
 	    $(document).ready(function(){
-				
 			var keys = [];
 			var i = 0;
 			for (key in localStorage) {
@@ -26,9 +25,9 @@
 				if(code == 13) { //Enter keycode
 					var date = Date();
 					var logmsg = ('<p>' + date + ' - ' + $('#msg').val() + '</p>');
-					xml
+					localStorage.setItem(date,logmsg)
+					$('#log').prepend(logmsg);
 					$('#msg').val("");
-
 					}
 			});
     })
