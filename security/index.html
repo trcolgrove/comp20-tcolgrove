@@ -1,0 +1,266 @@
+<html>
+<head>
+  <title>Security Vulnerabilty Report</title>
+  <style>
+  img{
+    margin: 20px 20px 20px 20px;
+  }
+  </style>
+</head>
+<body>
+  <h2>Introduction</h2>
+  <p>
+    I have been hired to rigorously test a locations API for security and privacy vulnerabilities. The product is a user mapping
+    suite, which allows POSTing of various user locations through a /sendLocation API, and retrieval of said locations with the
+    previously mentioned POST method, and GET /location.json. Furthermore, the root directory of the product can display the
+    logins, locations, and check in times of all users in the system. For common usage, the system works, however, I found gaping
+    security holes in the server, which open the product to a multitude of malicious attacks. In this write-up I will address the
+    security problems I found, and some fairly straight-forward methods to resolve (most of) them.
+
+  <h2>Methodology</h2>
+  <p>
+    In order to test the vulnerabilities inherent to the system, I began with a series of 'black-box' tests. In these tests,
+    I attempted to put the integrity of the server under stress without looking at source code. Such tests are useful because
+    they emulate the kind of attempts real-world hackers and criminals might make to exploit vulnerabilities. Even without
+    having access to source code, there were several obvious and glaring vulnerabilities, which I was able to exploit right
+    away.
+  </p>
+  <p>
+    Following black-box testing, I looked at the source code of the product, and even more security flaws became apparent.
+    Although these flaws may not have been quite as obvious, they undoubtedly would have been the target of malicious attacks
+    if left unresolved.
+  </p>
+
+  <h2>Abstract</h2>
+  The current product does nothing to examine the validity of user input. Unfortunately, this means that people with bad intentions
+  can submit input into the product that will do horrible and unexpected things to your product. For example, I can insert my own
+  code into the user input field of the API, and have it execute in the root directory when anyone tries to visit. The implications
+  of this are enormous, as attackers could use this vulnerability to execute malicious scripts, which could do things such as steal
+  private information (including authorization keys, or bank account numbers). This is not something you want your users to experience!
+  Thankfully many of the fixes to the problems discussed here are fairly straightforward.
+
+  <h2>Issues Found</h2>
+
+  <h3>1. XSS (Cross Site Scripting) / Database Injection</h3>
+  <h4> Location: </h4> <span> /sendLocation, / (root directory) </span>
+  <h4>Description of Issue</h4>
+  <p>
+    At present, the server is completely vulnerable to Cross Site Scripting Attacks. This allows insertion of
+    malicious code into the product’s database, which will then display in the root directory. The core of this
+    issue is that the /sendLocation API does not verify the user input that is being posted. Instead, it puts
+    whatever input fields it receives into its database, which means there is no guarantee on the type or content
+    of the data being stored. This allows users who are up to no good to insert data such as malicious javascript code into
+    the database.
+  </p>
+  <h4>Severity: HIGH</h4>
+  An exploit of this problem could result in numerous malicious scripts inserted into the database. Unfortunately, if a client tries to display these entries, or access the root directory, they will instead be greeted by a malicious attack. Redirects to different websites (such as the one I perform) are some of the least malicious exploits possible with this bug. Far worse exploits could access your database itself, delete its contents, steal user information, and much more.
+
+
+  <h4>Exploit and Proof of Vulnerability</h4>
+  <p>
+    I was able to discover this issue almost immediately by posting the following line to the
+    server:
+  </p>
+  <pre><code>"login=&ltscript&gtalert('BLUE CANARY IN THE OUTLET BY THE LIGHT SWITCH'); alert('WHO WATCHES OVER YOOOOOOU!!!!!!!!');
+    window.location='https://www.youtube.com/watch?v=NhjSzjoU7OQ';
+    &lt/script&gt&amplat=0&amplng=0"</pre></code>
+  <div>This resulted in the following behavior:</div>
+
+  <div><img src="alert1.png" alt="alert"></div>
+
+  <div><img src="alert2.png" alt="alert"></div>
+
+  <p> ...and at present, visiting Andre's site results in a series of alert messages followed by a redirect to either a classic 80s
+    commercial featuring 13 year olds rapping about Legend of Zelda, or the music video for the greatest song ever written
+    (birdhouse in your soul by they might be giants) depending on which redirect occurs first (they are asynchronous)
+  </p>
+  <h4>Resolution</h4>
+  <p>
+    Fortunately, there are some relatively straightforward ways to improve security in this regard. The use of validators and
+    sanitizers is highly recommended, as we can strip the user input of potentially malicious characters such as the angle
+    brackets used to declare html tags. Here are a few examples of fixes that could be employed.
+  </p>
+  <div>Option 1: Use the npm validator package to ensure all logins are alphanumeric: <a href="https://www.npmjs.com/package/validator">https://www.npmjs.com/package/validator</a> </div>
+  <pre><code>if(!(validator.isAlphanumeric(user_name))){
+		response.send("{'error' : 'whoops! something is wrong with your data (non-alphanumeric characters disallowed for logins, sorry!)'}");
+		return;
+}	</pre></code>
+
+<p>
+  This solution will flat out reject any non alphanumeric logins, and prevent malicious data from being inserted into your
+  database.
+</p>
+<p>
+Now if we run the server with the same scripting attack as before we will get an error message back and the malicious data will not be inserted into the database!
+</p>
+<p>
+  If for some reason the product must include non-alphanumeric characters, we can use the following to escape invalid dangerous characters and replace them with their html equivalent.
+</p>
+<pre><code>user_name = validator.escape(user_name)</pre></code>
+
+<p>For latitude and longitude, the product employs the parseFloat() method. Fortunately, if the code is not numeric, parseFloat will return NAN, so we can simply do the following to verify input:
+</p>
+
+<pre><code>if(lat == NaN || lng == NaN || lat > 90 || lat < -90 || lng > 180 || lng < -180){
+	  response.send("{'error' : 'whoops! something is wrong with your data!'}");
+	  return;
+}</pre></code>
+
+<h3>2. No protection of user privacy, or verification of valid login credentials, use of response.header('Access-Control-Allow-Origin', '*');
+</h3>
+<h4> Location: </h4> <span> Entire Application</span>
+<h4>Description of Issue</h4>
+<p>
+  The core of this issue is that the /sendLocation API does not verify the user input that is being posted. Instead, it
+  puts whatever input fields it receives into its database, which means there is no guarantee on the type or content of the data
+  being stored. This allows malicious users to insert data such as malicious javascript code into the database.
+</p>
+<h4>Severity: MEDIUM</h4>
+<p>
+I can POST with any user name and inject false and incorrect information into the database, as well receive location information about
+all users in the system. In this way, the privacy of the server is non-existant, and provides access to private information about the '
+whereabouts of all users to anyone with an internet connection. This problem is made worse by the setting <code>response.header('Access-Control-Allow-Origin', '*')</code>
+, as you grant access to the api to any client.
+</p>
+
+<h4>Exploit and Proof of Vulnerability</h4>
+<div>To exploit this vulnerability, I simply curled using bad info from bad users (Mecha-Hitler and ISIS). I was not blocked, and I recieved all of the information for all of the users.</div>
+
+<div><img src="mecha_hitler.png" alt="literally hitler"></div>
+
+<div>Upon Visiting the Root Directory....</div>
+
+<div><img src="rootofallevil.png" alt="the root of all evil"></div>
+
+<p>Not only were MechaHitler and ISIS able to gain full access to innocent users information,
+   but they were able to insert invalid coordinates into the database, which could crash client-side
+   code depending on valid latitude and longitude coordinates.
+</p>
+<h4>Resolution</h4>
+<p>Implement encrypted access keys for your API, and only give access to specific clients. This way, in order to login,
+   a client would not only need an access key, but need to be approved to use the API. This way you could have some control
+  over who uses your API and who does not. This is a good step toward preventing the bad guys from having access to your server!
+</p>
+
+<div>In order to restrict access we can change the problematic:</div>
+<pre><code>res.header('Access-Control-Allow-Origin', '*');</pre></code>
+<div>to:</div>
+<pre><code>res.header("Access-Control-Allow-Origin", accepted_users);</pre></code>
+<div>Where acceptable_users is a list of approved clients. This may require some time and money, as depending on your purposes, you may need to go out of your
+  way to talk to clients, and verify their credentials. However, it is possible in most cases to automate this process.</div>
+
+
+<h3>3. No Check on Length Of Input</h3>
+  <h4> Location: </h4> <span>/sendLocation</span>
+  <h4>Description of Issue</h4>
+
+  <p>
+    The server currently does nothing to limit the length of input parameters.
+  </p>
+  <h4>Severity: MILD</h4>
+  With the current server implementation, I can have input of any length. While the implications of this issue are not
+  immediately obvious, consider if someone tried to post a 1 Terabyte file to the login field. The server would allow this,
+  but you would be wasting enormous amounts of Database space, and where storage space is wasted, money is wasted. Furthermore,
+  clients would get back some really ugly and enormous logins back, causing their product to be ugly and slow.
+
+  <h4>Exploit and Proof of Vulnerability</h4>
+  <p>
+    Once again, I was able to find this error while black-box testing. Using curl, I was able to insert some very long logins, such as:
+  </p>
+
+  <div><img src="longinput.png" alt="long input"></div>
+
+  <div>etc...</div>
+
+  <p> Fortunately enough, default methods for POSTING to express automatically cap input at a certain length,
+    so I was not quite able to insert the entire text of Homer's the Odyssey into the database. Still, this security hole could
+    lead to an enormous waste/drain on database storage space. Therefore, this could be an expensive bug to leave unchecked.
+  </p>
+  <h4>Resolution</h4>
+  <p>
+    Fortunately there is an easy solution here. Check the length of your fields before inserting them into the database.
+  </p>
+  <pre><code>if(user_name.length > 30){
+		response.send("{'error' : 'whoops! something is wrong with your data! (please choose a login of 50 characters or less)'}");
+		return;
+}
+  </pre></code>
+
+
+<h3>4. Race Conditions in Send Location</h3>
+<h4> Location: </h4> <span> /sendLocation</span>
+<h4>Description of Issue</h4>
+<p>There is a race condition in the POST method between updating the database and returning information to the user</p>
+<h4>Severity: MILD</h4>
+<p>This is both a bug and a security issue. On the sendLocation command, the server does not nest the finding an returning of
+   JSON in the callback function of the update. Due to the asynchronous nature of database queries, this means that a POST to
+   /sendLocation  can return to the client without the proper values caused by the update. This could certainly cause code on
+   the client side to be unreliable, and break.
+</p>
+<h4>Exploit and Proof of Vulnerability</h4>
+<div> I found this issue while black-box testing and verified the problem by looking at the source code. The following is the problematic code:</div>
+<pre><code>
+  db.collection('location', function(error1, collection) {
+
+   collection.update({login: user_name}, {$set: {"lat": lat, "lng": lng, "created_at" : date}},
+     {upsert:true});
+
+   collection.find().toArray(function(err, cursor){
+     response.status(200);
+     response.send(cursor);
+   });
+
+ });
+ </pre></code>
+ <div>Here is a picture of the issue tested on local host. Note that I received an empty array without Jenkins's
+    information after posting
+ </div>
+ <div><img src="race_condition.png" alt="long input"></div>
+
+ <h4>Resolution</h4>
+ <p>Nest the call to collection.find() inside of the callback of collection.update(). This will ensure that the son array is not returned until the database has finished its update. </p>
+
+ <div>fixed:</div>
+ <pre><code>
+   collection.update({login: user_name}, {$set: {"lat": lat, "lng": lng, "created_at" : date}},
+     {upsert:true}, function(err, cursor){
+
+       collection.find().toArray(function(err, cursor){
+           response.status(200);
+           response.send(cursor);
+       });
+   });
+ </pre></code>
+
+ <h3>5. Bonus Round: Vulnerability to DDoS (Distributed Denial of Service)</h3>
+ <h4>Location</h4>
+ <span>Everywhere</span>
+ <h4>Severity/Description</h4>
+ <p>Medium. The idea here is that malicious people could send an enormous amount of queries to your API, using bots that appear
+   to originate from many different sources. This will be too much for this server to handle, and it will invariably make
+   access impossible for users.
+ </p>
+ <h4>Resolution</h4>
+ <p>Unfortunately, there is no easy way to prevent DDoS attacks, and even major companies (such as Sony), often fall victim.
+    Common methods of combatting these attacks often include trying to identify whether or not traffic is legitimate,
+    or part of an attack. Furthermore, larger companies can buy more servers, and employ loadbalancers to try and mitigate
+    the effects. However, there is a tradeoff here, as buying more servers is expensive.
+ </p>
+
+<h2>Conclusion</h2>
+<p>A lot of the security vulnerabilities discussed here can be resolved easily at very little cost, by simply verifying
+user input, and making sure that it is not something you do not want it to be. As a future precaution, and a general rule,
+you should never ever trust user input. Getting in the habit of escaping or sanitizing malicious inputs, as well
+as limiting the length of input will save you a lot of time and money by making your product more secure. Furthermore,
+it is evident that the developers need to be more careful with asynchronous requests to a database, and making sure
+that they do not invoke application breaking race conditions. Finally, you should consider redesigning this app, and future
+ones with privacy in mind. Verify user credentials with encrypted passwords and access-keys. Users do not appreciate
+having their private info (such as their location), exposed to the entire world. Most of these solutions are fairly cost effective,
+and only require a little more attention to detail when coding. However, if you want to be protected in DDoS attacks, it will be a major investment.
+Not only is extra server space to armor yourself expensive, attack detection methods are difficult to implement. Ask yourself how
+likely you are to be attacked, and what the consequences of such an attack would be, and make your decisions accordingly.
+Thank You. </p>
+
+
+</body>
+</html>
