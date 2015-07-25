@@ -172,8 +172,8 @@ whereabouts of all users to anyone with an internet connection. This problem is 
 
   <div>etc...</div>
 
-  <p> Fortunately enough, default methods for POSTING to express automatically cap input at a certain length,
-    so I was not quite able to insert the entire text of Homer's the Odyssey into the database. Still, this security hole could
+  <p> Fortunately enough, using curl to POST to the server automatically capped input at a certain (very long) length,
+    so I was not quite able to insert the entire text of Homer's the Odyssey into the database (but someone else could probably find a workaround!). Still, this security hole could
     lead to an enormous waste/drain on database storage space. Therefore, this could be an expensive bug to leave unchecked.
   </p>
   <h4>Resolution</h4>

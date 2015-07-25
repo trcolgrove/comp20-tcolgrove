@@ -1,13 +1,15 @@
 var myLat = 0;
 var myLng = 0;
 var map;
-var url = "https://secret-about-box.herokuapp.com/sendLocation";
+var url = "https://fathomless-everglades-2760.herokuapp.com/sendLocation";
+//var url = "http://localhost:5000/sendLocation";
+
 var xmlhttp = new XMLHttpRequest();
 var me = new google.maps.LatLng(myLat, myLng);
 var marker;
 var places;
 var infowindow = new google.maps.InfoWindow();
-var myLogin = "FrancieCarmody";
+var myLogin = "Yoshi";
 var audio = new Audio('yoshi.wav');
 
 
@@ -49,7 +51,7 @@ function renderMap(){
 }
 
 function getUserLocations(){
-  params = "login=FrancieCarmody&lat=" + myLat + "&lng=" + myLng;
+  params = "login=" + myLogin + "&lat=" + myLat + "&lng=" + myLng ;
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xmlhttp.send(params);
@@ -57,6 +59,7 @@ function getUserLocations(){
 
   xmlhttp.onreadystatechange = function(){
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+      console.log(xmlhttp.responseText);
       var userlist = JSON.parse(xmlhttp.responseText);
       parseUserJSON(userlist);
       var load_screen = document.getElementById("load_screen");
